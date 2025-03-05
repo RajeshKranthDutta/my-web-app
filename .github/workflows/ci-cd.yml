@@ -22,7 +22,7 @@ jobs:
       run: |
         echo "Azure ACR Name: ${{ secrets.AZURE_ACR_NAME }}"  # Checking ACR Name
         echo "Azure ACR Username: ${{ secrets.AZURE_ACR_USERNAME }}"  # Checking ACR Username
-        echo "Azure ACR Password: ${AZURE_ACR_PASSWORD}"  # Don’t print password, just ensure it's available
+        echo "Azure ACR Password: ${AZURE_ACR_PASSWORD}"  # Don't print password, just ensure it's available
         echo "Azure Credentials: ${{ secrets.AZURE_CREDENTIALS }}"  # Checking if AZURE_CREDENTIALS is loaded
 
     # Step 3: Log in to Azure using Service Principal (with GitHub secrets)
@@ -30,19 +30,20 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        environment: azurecloud  # This can be adjusted to your Azure environment (e.g., 'azureusgovernment')
+        environment: azurecloud
 
     # Step 4: Log in to Azure Container Registry (ACR)
     - name: Log in to Azure Container Registry
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io  # Use your ACR name (e.g., <your-acr-name>.azurecr.io)
-        username: ${{ secrets.AZURE_ACR_USERNAME }}  # ACR username (usually the registry name)
-        password: ${{ secrets.AZURE_ACR_PASSWORD }}  # ACR password or service principal client secret
+        login-server: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io
+        username: ${{ secrets.AZURE_ACR_USERNAME }}
+        password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-    # Step 5: Build and Push Docker Image to Azure Container Registry
-    - name: Build and push Docker image
+    # Step 5: Debug the ACR Name during Docker build step
+    - name: Debug ACR Name during Docker build
       run: |
+        echo "ACR Name: '${{ secrets.AZURE_ACR_NAME }}'"  # Debug the value of ACR Name before using it in the tag
         docker build -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/my-web-app:v1 .
         docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/my-web-app:v1
 
