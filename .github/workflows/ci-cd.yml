@@ -1,4 +1,5 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
@@ -9,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Check out code from the repository
     - name: Check out code
       uses: actions/checkout@v2
 
-    # Step to log into Azure using Service Principal (using the GitHub secrets)
+    # Step 2: Log in to Azure using Service Principal (with GitHub secrets)
     - name: Log in to Azure
       uses: azure/login@v1
       with:
@@ -20,21 +22,21 @@ jobs:
         client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}  # Service Principal Client Secret
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}  # Tenant ID
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure Subscription ID
-        environment: azurecloud  # Or other environment if you're not on Azure public cloud
+        environment: azurecloud  # Can be 'azurecloud', 'azureusgovernment', etc. depending on your environment
 
-    # Step to log in to Azure Container Registry (ACR)
+    # Step 3: Log in to Azure Container Registry (ACR)
     - name: Log in to Azure Container Registry
       uses: azure/docker-login@v1
       with:
-        login-server: k8steamcontainerregistry.azurecr.io
+        login-server: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io  # Use your ACR name (e.g., <your-acr-name>.azurecr.io)
 
-    # Build and Push Docker Image to #ACR
+    # Step 4: Build and Push Docker Image to Azure Container Registry
     - name: Build and push Docker image
       run: |
-        docker build -t k8steamcontainerregistry.azurecr.io/my-web-app:v1 .
-        docker push k8steamcontainerregistry.azurecr.io/my-web-app:v1
+        docker build -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/my-web-app:v1 .
+        docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/my-web-app:v1
 
-    # Deploy to Azure Kubernetes Service (AKS)
+    # Step 5: Deploy to Azure Kubernetes Service (AKS)
     - name: Deploy to Azure Kubernetes Service
       run: |
-        kubectl apply -f k8s/deployment.yaml  # Update to your actual Kubernetes manifest
+        kubectl apply -f k8s/deployment.yaml  # Update this to your actual Kubernetes manifest file (deployment.yaml)
