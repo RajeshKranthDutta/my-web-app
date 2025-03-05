@@ -5,6 +5,9 @@ on:
     branches:
       - master  # Or 'main' depending on your setup
 
+permissions:
+  id-token: write  # Add necessary permissions for id-token
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,10 +21,7 @@ jobs:
     - name: Log in to Azure
       uses: azure/login@v1
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}  # Service Principal Client ID
-        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}  # Service Principal Client Secret
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}  # Tenant ID
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  # Azure Subscription ID
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Service Principal credentials in JSON format stored in GitHub secrets
         environment: azurecloud  # Can be 'azurecloud', 'azureusgovernment', etc. depending on your environment
 
     # Step 3: Log in to Azure Container Registry (ACR)
