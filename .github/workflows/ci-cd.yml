@@ -28,7 +28,7 @@ jobs:
       with:
         login-server: k8steamcontainerregistry.azurecr.io
 
-    # Build and Push Docker Image to ACR
+    # Build and Push Docker Image to #ACR
     - name: Build and push Docker image
       run: |
         docker build -t k8steamcontainerregistry.azurecr.io/my-web-app:v1 .
